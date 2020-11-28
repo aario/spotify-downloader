@@ -1,0 +1,5 @@
+#!/bin/bash
+source_path=`dirname "$0"`
+source_path=`readlink -f "$source_path"`
+docker build -t "spotdl" "$source_path"
+docker run -v"${PWD}":/local -ti spotdl spotdl "$1"

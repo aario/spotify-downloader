@@ -22,6 +22,7 @@ from typing import List
 from spotdl.search.songObj import SongObj
 from spotdl.download.progressHandlers import DisplayManager, DownloadTracker
 
+import subprocess
 
 
 #==========================
@@ -98,33 +99,8 @@ def download_song(songObj: SongObj, displayManager: DisplayManager = None,
 
 
     # download Audio from YouTube
-    if displayManager:
-        youtubeHandler = YouTube(
-            url                  = songObj.get_youtube_link(),
-            on_progress_callback = displayManager.pytube_progress_hook
-        )
-    else:
-        youtubeHandler = YouTube(songObj.get_youtube_link())
-    
-    trackAudioStream = youtubeHandler.streams.get_audio_only()
-
-    #! The actual download, if there is any error, it'll be here,
-    try:
-        #! pyTube will save the song in .\Temp\$songName.mp4, it doesn't save as '.mp3'
-        downloadedFilePath = trackAudioStream.download(
-            output_path   = tempFolder,
-            filename      = convertedFileName,
-            skip_existing = False
-        )
-    except:
-        #! This is equivalent to a failed download, we do nothing, the song remains on
-        #! downloadTrackers download queue and all is well...
-        #!
-        #! None is again used as a convenient exit
-        remove(join(tempFolder, convertedFileName) + '.mp4')
-        return None
-    
-
+    downloadedFilePath = subprocess.check_output(['youtube-dl', '--get-filename', '-f', 'bestaudio', songObj.get_youtube_link()]).decode('UTF-8').rstrip("\n")
+    subprocess.check_output(['youtube-dl', '-f', 'bestaudio', songObj.get_youtube_link()]).decode('UTF-8').rstrip("\n")
 
     # convert downloaded file to MP3 with normalization
 
